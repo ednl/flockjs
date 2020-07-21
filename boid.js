@@ -3,17 +3,31 @@ class Boid {
 		this.pos = createVector(x, y);
 		this.vel = createVector();
 		this.acc = createVector();
-		this.size = 10;
+		let h = random(45);  // random hue red-yellow
+		if (h < 15)
+			h *= 3;  // not so many red ones
+		this.col = color(h, 100, 100);
+		this.size = map(h, 0, 45, 16, 8);  // red ones are bigger
+		this.maxSpeed = this.size / 4;  // big ones go faster
+		this.head = 0;
 	}
 
 	update() {
-		// TODO: update acceleration here
-		this.acc.x += random(-1, 1);
-		this.acc.y += random(-1, 1);
+		// TODO: determine acceleration from neighbours
+		this.acc.x = random(-1, 1);
+		this.acc.y = random(-1, 1);
+		// for (const other of flock) {
+		// 	if (other !== this) {
+		// 		if () {
+
+		// 		}
+		// 	}
+		// }
 
 		// Euler
 		this.vel.add(this.acc);
-		this.vel.limit(5);
+		this.vel.limit(this.maxSpeed);
+		this.head = this.vel.heading();
 		this.pos.add(this.vel);
 
 		// Wrap around
@@ -27,18 +41,16 @@ class Boid {
 		} else if (this.pos.y < -10) {
 			this.pos.y = height + 10;
 		}
-
-		// Reset acceleration
-		this.acc.mult(0);
 	}
 
 	show() {
 		push();
 		translate(this.pos.x, this.pos.y);
-		rotate(this.vel.heading());
-		stroke(0, 255, 0);
-		strokeWeight(2);
-		noFill();
+		rotate(this.head);
+		strokeWeight(1);
+		// stroke(this.col);
+		stroke(fg);
+		fill(this.col);
 		beginShape();
 		vertex(this.size, 0);
 		const t = -this.size / 2;
