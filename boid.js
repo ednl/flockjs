@@ -1,6 +1,6 @@
 class Boid {
-	constructor(x, y) {
-		this.pos = createVector(x, y);
+	constructor() {
+		this.pos = createVector(random(width), random(height));
 		this.vel = createVector();
 		this.acc = createVector();
 		let h = random(45);  // random hue red-yellow
@@ -16,18 +16,27 @@ class Boid {
 		// TODO: determine acceleration from neighbours
 		this.acc.x = random(-1, 1);
 		this.acc.y = random(-1, 1);
-		// for (const other of flock) {
-		// 	if (other !== this) {
-		// 		if () {
-
-		// 		}
-		// 	}
-		// }
 
 		// Euler
 		this.vel.add(this.acc);
 		this.vel.limit(this.maxSpeed);
 		this.head = this.vel.heading();
+
+		let val = 0;
+		let count = 0;
+		for (const other of flock) {
+			if (other !== this && this.pos.dist(other.pos) < 50) {
+				val += other.head;
+				count++;
+			}
+		}
+		if (count) {
+			val /= count;
+			const da = (val - this.head) * 0.2;
+			this.vel.rotate(da);
+			this.head += da;
+		}
+
 		this.pos.add(this.vel);
 
 		// Wrap around
